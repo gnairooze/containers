@@ -1,0 +1,45 @@
+version: "3.9"
+
+# osticket dockers configuration
+# docker-compose up
+
+volumes:
+  db_data:
+    name: ${VOLUME_DATA_NAME}
+
+  osticket_data:
+    name: ${OSTICKET_DATA}
+
+  osticket_logs:
+    name: ${OSTICKET_LOGs}
+
+services:
+  osticket:
+    image: osticket/osticket
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      INSTALL_SECRET: ${OSTICKET_INSTALL_SECRET}
+      MYSQL_HOST: db
+      MYSQL_USER: ${OSTICKET_MYSQL_USER}
+      MYSQL_PASSWORD: ${OSTICKET_MYSQL_PASSWORD}
+    volumes:
+      - osticket_data:/var/www/src
+      - osticket_logs:/var/www/logs
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
